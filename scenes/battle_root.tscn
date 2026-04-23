@@ -1,0 +1,135 @@
+[gd_scene format=3 uid="uid://b4vy33w2e7txu"]
+
+[ext_resource type="Script" path="res://scripts/battle_root.gd" id="1_8r08p"]
+[ext_resource type="Script" uid="uid://dau6bfohc6bby" path="res://scripts/sphere.gd" id="1_v24s3"]
+[ext_resource type="Texture2D" uid="uid://b1uddw3qbw0q0" path="res://assets/sphere_placeholder.svg" id="2_2yvlu"]
+[ext_resource type="Texture2D" uid="uid://dx6qfcrxx6nug" path="res://assets/wall_placeholder.svg" id="3_j7f6w"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_wall"]
+friction = 0.0
+bounce = 1.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_top"]
+size = Vector2(1280, 32)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_side"]
+size = Vector2(32, 720)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_sphere"]
+friction = 0.0
+bounce = 1.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_3jvq6"]
+radius = 24.0
+
+[node name="BattleRoot" type="Node2D" unique_id=1432565710]
+script = ExtResource("1_8r08p")
+
+[node name="TopWall" type="StaticBody2D" parent="." unique_id=455841779]
+position = Vector2(640, 16)
+physics_material_override = SubResource("PhysicsMaterial_wall")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TopWall" unique_id=1176011510]
+shape = SubResource("RectangleShape2D_top")
+
+[node name="Sprite2D" type="Sprite2D" parent="TopWall" unique_id=1892404267]
+scale = Vector2(20, 0.5)
+texture = ExtResource("3_j7f6w")
+
+[node name="BottomWall" type="StaticBody2D" parent="." unique_id=1192649028]
+position = Vector2(640, 704)
+physics_material_override = SubResource("PhysicsMaterial_wall")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BottomWall" unique_id=1556934753]
+shape = SubResource("RectangleShape2D_top")
+
+[node name="Sprite2D" type="Sprite2D" parent="BottomWall" unique_id=637114146]
+scale = Vector2(20, 0.5)
+texture = ExtResource("3_j7f6w")
+
+[node name="LeftWall" type="StaticBody2D" parent="." unique_id=1910267474]
+position = Vector2(16, 360)
+physics_material_override = SubResource("PhysicsMaterial_wall")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall" unique_id=1863703179]
+shape = SubResource("RectangleShape2D_side")
+
+[node name="Sprite2D" type="Sprite2D" parent="LeftWall" unique_id=1073466136]
+rotation = 3.1415927
+scale = Vector2(0.5, 11.25)
+texture = ExtResource("3_j7f6w")
+
+[node name="RightWall" type="StaticBody2D" parent="." unique_id=267849385]
+position = Vector2(1264, 360)
+physics_material_override = SubResource("PhysicsMaterial_wall")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall" unique_id=2056143749]
+shape = SubResource("RectangleShape2D_side")
+
+[node name="Sprite2D" type="Sprite2D" parent="RightWall" unique_id=1211536081]
+rotation = 3.1415927
+scale = Vector2(0.5, 11.25)
+texture = ExtResource("3_j7f6w")
+
+[node name="Sphere1" type="RigidBody2D" parent="." unique_id=1310362860]
+position = Vector2(560, 600)
+physics_material_override = SubResource("PhysicsMaterial_sphere")
+gravity_scale = 0.0
+freeze = true
+continuous_cd = 2
+script = ExtResource("1_v24s3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sphere1" unique_id=1997069596]
+shape = SubResource("CircleShape2D_3jvq6")
+
+[node name="AimLine" type="Line2D" parent="Sphere1" unique_id=945084342]
+visible = false
+points = PackedVector2Array(0, 0, 0, -1)
+width = 4.0
+default_color = Color(0.25, 0.9, 1, 0.9)
+
+[node name="Sprite2D" type="Sprite2D" parent="Sphere1" unique_id=555088633]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_2yvlu")
+
+[node name="Sphere2" type="RigidBody2D" parent="."]
+position = Vector2(640, 600)
+physics_material_override = SubResource("PhysicsMaterial_sphere")
+gravity_scale = 0.0
+freeze = true
+continuous_cd = 2
+script = ExtResource("1_v24s3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sphere2"]
+shape = SubResource("CircleShape2D_3jvq6")
+
+[node name="AimLine" type="Line2D" parent="Sphere2"]
+visible = false
+points = PackedVector2Array(0, 0, 0, -1)
+width = 4.0
+default_color = Color(0.25, 0.9, 1, 0.9)
+
+[node name="Sprite2D" type="Sprite2D" parent="Sphere2"]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_2yvlu")
+
+[node name="Sphere3" type="RigidBody2D" parent="."]
+position = Vector2(720, 600)
+physics_material_override = SubResource("PhysicsMaterial_sphere")
+gravity_scale = 0.0
+freeze = true
+continuous_cd = 2
+script = ExtResource("1_v24s3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Sphere3"]
+shape = SubResource("CircleShape2D_3jvq6")
+
+[node name="AimLine" type="Line2D" parent="Sphere3"]
+visible = false
+points = PackedVector2Array(0, 0, 0, -1)
+width = 4.0
+default_color = Color(0.25, 0.9, 1, 0.9)
+
+[node name="Sprite2D" type="Sprite2D" parent="Sphere3"]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_2yvlu")
