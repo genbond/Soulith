@@ -4,6 +4,8 @@
 [ext_resource type="Script" uid="uid://dau6bfohc6bby" path="res://scripts/sphere.gd" id="1_v24s3"]
 [ext_resource type="Texture2D" uid="uid://b1uddw3qbw0q0" path="res://assets/sphere_placeholder.svg" id="2_2yvlu"]
 [ext_resource type="Texture2D" uid="uid://dx6qfcrxx6nug" path="res://assets/wall_placeholder.svg" id="3_j7f6w"]
+[ext_resource type="Script" path="res://scripts/enemy_manager.gd" id="4_5k3pn"]
+[ext_resource type="Script" path="res://scripts/enemy.gd" id="5_m4ubn"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_wall"]
 friction = 0.0
@@ -22,8 +24,14 @@ bounce = 1.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_3jvq6"]
 radius = 24.0
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_enemy"]
+radius = 28.0
+
 [node name="BattleRoot" type="Node2D" unique_id=1432565710]
 script = ExtResource("1_8r08p")
+
+[node name="EnemyManager" type="Node" parent="."]
+script = ExtResource("4_5k3pn")
 
 [node name="TopWall" type="StaticBody2D" parent="." unique_id=455841779]
 position = Vector2(640, 16)
@@ -91,6 +99,7 @@ default_color = Color(0.25, 0.9, 1, 0.9)
 [node name="Sprite2D" type="Sprite2D" parent="Sphere1" unique_id=555088633]
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("2_2yvlu")
+modulate = Color(1, 0.45, 0.45, 1)
 
 [node name="Sphere2" type="RigidBody2D" parent="."]
 position = Vector2(640, 600)
@@ -112,6 +121,7 @@ default_color = Color(0.25, 0.9, 1, 0.9)
 [node name="Sprite2D" type="Sprite2D" parent="Sphere2"]
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("2_2yvlu")
+modulate = Color(0.45, 0.9, 1, 1)
 
 [node name="Sphere3" type="RigidBody2D" parent="."]
 position = Vector2(720, 600)
@@ -133,3 +143,16 @@ default_color = Color(0.25, 0.9, 1, 0.9)
 [node name="Sprite2D" type="Sprite2D" parent="Sphere3"]
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("2_2yvlu")
+modulate = Color(0.6, 1, 0.5, 1)
+
+[node name="Enemy1" type="Area2D" parent="."]
+position = Vector2(640, 180)
+script = ExtResource("5_m4ubn")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Enemy1"]
+shape = SubResource("CircleShape2D_enemy")
+
+[node name="Sprite2D" type="Sprite2D" parent="Enemy1"]
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("2_2yvlu")
+modulate = Color(1, 0.75, 0.2, 1)
