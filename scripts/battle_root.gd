@@ -21,9 +21,12 @@ var spheres: Array[RigidBody2D] = []
 var launched_count: int = 0
 var enemy_manager: Node = null
 var current_phase: BattlePhase = BattlePhase.PLAYER_TURN
+var ended_turn_without_launch: bool = false
 
 
 func _ready() -> void:
+	_ensure_end_turn_input()
+
 	if has_node(enemy_manager_path):
 		enemy_manager = get_node(enemy_manager_path)
 		if enemy_manager.has_method("on_enemy_turn_started"):
@@ -45,8 +48,20 @@ func _ready() -> void:
 
 func _start_player_turn() -> void:
 	launched_count = 0
+	ended_turn_without_launch = false
 	for sphere: RigidBody2D in spheres:
 		sphere.start_new_turn()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if current_phase != BattlePhase.PLAYER_TURN:
+		return
+
+	if event.is_action_pressed("end_turn"):
+		if _any_sphere_in_flight():
+			return
+		_end_player_turn_manually()
+		get_viewport().set_input_as_handled()
 
 
 func _on_sphere_launched(launched_sphere: RigidBody2D) -> void:
@@ -87,6 +102,8 @@ func _start_enemy_turn() -> void:
 
 func _start_resolve_phase() -> void:
 	# TODO: Apply end-of-turn effects (poison, block, etc.).
+	if ended_turn_without_launch:
+		print("このターンは未投球のため、ソウルサイクルは進行しない")
 	_enter_phase(BattlePhase.PLAYER_TURN)
 
 
@@ -121,3 +138,34 @@ func _phase_to_text(phase: BattlePhase) -> String:
 		BattlePhase.REWARD:
 			return "REWARD"
 	return "UNKNOWN"
+
+
+func _end_player_turn_manually() -> void:
+	ended_turn_without_launch = _count_launched_spheres() == 0
+	_enter_phase(BattlePhase.ENEMY_TURN)
+
+
+func _count_launched_spheres() -> int:
+	var launched_spheres: int = 0
+	for sphere: RigidBody2D in spheres:
+		if sphere.has_launched_in_turn():
+			launched_spheres += 1
+	return launched_spheres
+
+
+func _any_sphere_in_flight() -> bool:
+	for sphere: RigidBody2D in spheres:
+		if sphere.is_currently_in_flight():
+			return true
+	return false
+
+
+func _ensure_end_turn_input() -> void:
+	if InputMap.has_action("end_turn"):
+		return
+
+	InputMap.add_action("end_turn")
+	var key_event: InputEventKey = InputEventKey.new()
+	key_event.keycode = KEY_SPACE
+	key_event.physical_keycode = KEY_SPACE
+	InputMap.action_add_event("end_turn", key_event)

@@ -124,3 +124,11 @@ func unlock_launch() -> void:
 	if has_launched_this_turn or is_in_flight:
 		return
 	can_launch = true
+
+
+func has_launched_in_turn() -> bool:
+	return has_launched_this_turn
+
+
+func is_currently_in_flight() -> bool:
+	return is_in_flight
