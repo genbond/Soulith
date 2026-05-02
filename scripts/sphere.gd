@@ -3,6 +3,24 @@ extends RigidBody2D
 signal sphere_launched(sphere: RigidBody2D)
 signal sphere_stopped(sphere: RigidBody2D)
 
+const SOUL_LIBRARY: Dictionary = {
+	"stone": {
+		"id": "stone",
+		"display_name": "石ころ",
+		"attack": 2
+	},
+	"sword": {
+		"id": "sword",
+		"display_name": "ソード",
+		"attack": 5
+	},
+	"shield": {
+		"id": "shield",
+		"display_name": "盾",
+		"attack": 2
+	}
+}
+
 @export var max_drag_distance: float = 180.0
 @export var min_drag_distance: float = 16.0
 @export var launch_force: float = 10.0
@@ -10,11 +28,18 @@ signal sphere_stopped(sphere: RigidBody2D)
 @export var stop_speed_threshold: float = 20.0
 @export var collision_radius: float = 24.0
 @export var aim_line_path: NodePath = NodePath("AimLine")
+@export var initial_soul_ids: Array[StringName] = [
+	StringName("stone"),
+	StringName("stone"),
+	StringName("stone")
+]
 
 var is_dragging: bool = false
 var can_launch: bool = false
 var has_launched_this_turn: bool = false
 var is_in_flight: bool = false
+var souls: Array[Dictionary] = []
+var current_soul_index: int = 0
 
 @onready var aim_line: Line2D = get_node(aim_line_path) as Line2D
 
@@ -24,6 +49,7 @@ func _ready() -> void:
 	lock_rotation = true
 	freeze = true
 	aim_line.visible = false
+	_initialize_souls()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -132,3 +158,39 @@ func has_launched_in_turn() -> bool:
 
 func is_currently_in_flight() -> bool:
 	return is_in_flight
+
+
+func get_current_soul() -> Dictionary:
+	if souls.is_empty():
+		return {}
+	return souls[current_soul_index]
+
+
+func get_current_soul_name() -> String:
+	var soul: Dictionary = get_current_soul()
+	return String(soul.get("display_name", "未設定"))
+
+
+func get_current_soul_attack() -> int:
+	var soul: Dictionary = get_current_soul()
+	return int(soul.get("attack", 0))
+
+
+func advance_soul_cycle() -> void:
+	if souls.is_empty():
+		return
+	current_soul_index = (current_soul_index + 1) % souls.size()
+
+
+func _initialize_souls() -> void:
+	souls.clear()
+	for soul_id_name: StringName in initial_soul_ids:
+		var soul_id: String = String(soul_id_name)
+		var soul_data: Dictionary = SOUL_LIBRARY.get(soul_id, {})
+		if soul_data.is_empty():
+			continue
+		souls.append(soul_data.duplicate(true))
+
+	if souls.is_empty():
+		souls.append(SOUL_LIBRARY["stone"].duplicate(true))
+	current_soul_index = 0

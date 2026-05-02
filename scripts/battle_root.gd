@@ -21,7 +21,6 @@ var spheres: Array[RigidBody2D] = []
 var launched_count: int = 0
 var enemy_manager: Node = null
 var current_phase: BattlePhase = BattlePhase.PLAYER_TURN
-var ended_turn_without_launch: bool = false
 
 
 func _ready() -> void:
@@ -48,9 +47,9 @@ func _ready() -> void:
 
 func _start_player_turn() -> void:
 	launched_count = 0
-	ended_turn_without_launch = false
 	for sphere: RigidBody2D in spheres:
 		sphere.start_new_turn()
+	_log_current_souls()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -102,8 +101,7 @@ func _start_enemy_turn() -> void:
 
 func _start_resolve_phase() -> void:
 	# TODO: Apply end-of-turn effects (poison, block, etc.).
-	if ended_turn_without_launch:
-		print("このターンは未投球のため、ソウルサイクルは進行しない")
+	_apply_soul_cycle_per_sphere()
 	_enter_phase(BattlePhase.PLAYER_TURN)
 
 
@@ -141,7 +139,6 @@ func _phase_to_text(phase: BattlePhase) -> String:
 
 
 func _end_player_turn_manually() -> void:
-	ended_turn_without_launch = _count_launched_spheres() == 0
 	_enter_phase(BattlePhase.ENEMY_TURN)
 
 
@@ -151,6 +148,23 @@ func _count_launched_spheres() -> int:
 		if sphere.has_launched_in_turn():
 			launched_spheres += 1
 	return launched_spheres
+
+
+func _apply_soul_cycle_per_sphere() -> void:
+	for index: int in spheres.size():
+		var sphere: RigidBody2D = spheres[index]
+		var previous_soul_name: String = sphere.get_current_soul_name()
+		if sphere.has_launched_in_turn():
+			sphere.advance_soul_cycle()
+			print(
+				"スフィア%d: %s -> %s (投球済みのためサイクル進行)"
+				% [index + 1, previous_soul_name, sphere.get_current_soul_name()]
+			)
+		else:
+			print(
+				"スフィア%d: %s を維持 (未投球のため据え置き)"
+				% [index + 1, previous_soul_name]
+			)
 
 
 func _any_sphere_in_flight() -> bool:
@@ -169,3 +183,9 @@ func _ensure_end_turn_input() -> void:
 	key_event.keycode = KEY_SPACE
 	key_event.physical_keycode = KEY_SPACE
 	InputMap.action_add_event("end_turn", key_event)
+
+
+func _log_current_souls() -> void:
+	for index: int in spheres.size():
+		var sphere: RigidBody2D = spheres[index]
+		print("スフィア%d: 現在ソウル %s" % [index + 1, sphere.get_current_soul_name()])
