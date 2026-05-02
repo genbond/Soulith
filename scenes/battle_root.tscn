@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://b4vy33w2e7txu"]
 
-[ext_resource type="Script" path="res://scripts/battle_root.gd" id="1_8r08p"]
+[ext_resource type="Script" uid="uid://dvcf1u1o4fnu5" path="res://scripts/battle_root.gd" id="1_8r08p"]
 [ext_resource type="Texture2D" uid="uid://b1uddw3qbw0q0" path="res://assets/sphere_placeholder.svg" id="2_2yvlu"]
 [ext_resource type="Texture2D" uid="uid://dx6qfcrxx6nug" path="res://assets/wall_placeholder.svg" id="3_j7f6w"]
-[ext_resource type="Script" path="res://scripts/enemy_manager.gd" id="4_5k3pn"]
-[ext_resource type="Script" path="res://scripts/enemy.gd" id="5_m4ubn"]
+[ext_resource type="Script" uid="uid://bv67nlgs3e32j" path="res://scripts/enemy_manager.gd" id="4_5k3pn"]
+[ext_resource type="Script" uid="uid://cx2aaovscvu1k" path="res://scripts/enemy.gd" id="5_m4ubn"]
 [ext_resource type="PackedScene" path="res://scenes/sphere.tscn" id="6_h2ra6"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_wall"]
@@ -23,7 +23,7 @@ radius = 28.0
 [node name="BattleRoot" type="Node2D" unique_id=1432565710]
 script = ExtResource("1_8r08p")
 
-[node name="EnemyManager" type="Node" parent="."]
+[node name="EnemyManager" type="Node" parent="." unique_id=1894959267]
 script = ExtResource("4_5k3pn")
 
 [node name="TopWall" type="StaticBody2D" parent="." unique_id=455841779]
@@ -72,26 +72,27 @@ rotation = 3.1415927
 scale = Vector2(0.5, 8.4375)
 texture = ExtResource("3_j7f6w")
 
-[node name="Sphere1" parent="." instance=ExtResource("6_h2ra6") unique_id=1310362860]
+[node name="Sphere1" parent="." unique_id=1310362860 instance=ExtResource("6_h2ra6")]
 position = Vector2(880, 620)
 sphere_color = Color(1, 0.45, 0.45, 1)
 
-[node name="Sphere2" parent="." instance=ExtResource("6_h2ra6")]
+[node name="Sphere2" parent="." unique_id=2082758651 instance=ExtResource("6_h2ra6")]
 position = Vector2(960, 620)
 sphere_color = Color(0.45, 0.9, 1, 1)
 
-[node name="Sphere3" parent="." instance=ExtResource("6_h2ra6")]
+[node name="Sphere3" parent="." unique_id=1187348761 instance=ExtResource("6_h2ra6")]
 position = Vector2(1040, 620)
 sphere_color = Color(0.6, 1, 0.5, 1)
 
-[node name="Enemy1" type="Area2D" parent="."]
-position = Vector2(960, 280)
+[node name="Enemy1" type="StaticBody2D" parent="." unique_id=1716366155]
+position = Vector2(876, 539)
 script = ExtResource("5_m4ubn")
+metadata/_edit_group_ = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Enemy1"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Enemy1" unique_id=1384727393]
 shape = SubResource("CircleShape2D_enemy")
 
-[node name="Sprite2D" type="Sprite2D" parent="Enemy1"]
+[node name="Sprite2D" type="Sprite2D" parent="Enemy1" unique_id=1795333032]
+modulate = Color(1, 0.75, 0.2, 1)
 scale = Vector2(0.6, 0.6)
 texture = ExtResource("2_2yvlu")
-modulate = Color(1, 0.75, 0.2, 1)

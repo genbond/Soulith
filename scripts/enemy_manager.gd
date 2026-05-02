@@ -4,14 +4,14 @@ extends Node
 	NodePath("../Enemy1")
 ]
 
-var enemies: Array[Area2D] = []
+var enemies: Array[Node] = []
 
 
 func _ready() -> void:
 	for enemy_path: NodePath in enemy_paths:
 		if not has_node(enemy_path):
 			continue
-		var enemy: Area2D = get_node(enemy_path) as Area2D
+		var enemy: Node = get_node(enemy_path)
 		if enemy == null:
 			continue
 		enemies.append(enemy)

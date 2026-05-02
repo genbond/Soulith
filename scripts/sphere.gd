@@ -2,6 +2,7 @@ extends RigidBody2D
 
 signal sphere_launched(sphere: RigidBody2D)
 signal sphere_stopped(sphere: RigidBody2D)
+signal sphere_hit_enemy(sphere: RigidBody2D, enemy: Node, attack_power: int)
 
 const SOUL_LIBRARY: Dictionary = {
 	"stone": {
@@ -53,6 +54,7 @@ func _ready() -> void:
 	aim_line.visible = false
 	sprite_2d.modulate = sphere_color
 	_initialize_souls()
+	body_entered.connect(_on_body_entered)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -183,6 +185,15 @@ func advance_soul_cycle() -> void:
 	if souls.is_empty():
 		return
 	current_soul_index = (current_soul_index + 1) % souls.size()
+
+
+func _on_body_entered(body: Node) -> void:
+	if not is_in_flight:
+		return
+	if not body.has_method("apply_damage"):
+		return
+
+	emit_signal("sphere_hit_enemy", self, body, get_current_soul_attack())
 
 
 func _initialize_souls() -> void:

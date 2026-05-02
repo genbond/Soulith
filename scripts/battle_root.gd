@@ -18,6 +18,7 @@ enum BattlePhase {
 @export var enemy_manager_path: NodePath = NodePath("EnemyManager")
 
 var spheres: Array[RigidBody2D] = []
+var enemies: Array[Node] = []
 var launched_count: int = 0
 var enemy_manager: Node = null
 var current_phase: BattlePhase = BattlePhase.PLAYER_TURN
@@ -40,8 +41,10 @@ func _ready() -> void:
 		spheres.append(sphere)
 		sphere.set_launch_enabled(false)
 		sphere.sphere_launched.connect(_on_sphere_launched)
+		sphere.sphere_hit_enemy.connect(_on_sphere_hit_enemy)
 		sphere.sphere_stopped.connect(_on_sphere_stopped)
 
+	_collect_and_connect_enemies()
 	_enter_phase(BattlePhase.PLAYER_TURN)
 
 
@@ -87,6 +90,18 @@ func _on_sphere_stopped(stopped_sphere: RigidBody2D) -> void:
 		if sphere == stopped_sphere:
 			continue
 		sphere.unlock_launch()
+
+
+func _on_sphere_hit_enemy(source_sphere: RigidBody2D, enemy: Node, attack_power: int) -> void:
+	if current_phase != BattlePhase.PLAYER_TURN:
+		return
+	if not is_instance_valid(enemy):
+		return
+	if not enemy.has_method("apply_damage"):
+		return
+
+	enemy.apply_damage(attack_power)
+	print("%s -> %s に %d ダメージ (ヒット毎計算)" % [source_sphere.name, enemy.name, attack_power])
 
 
 func _start_enemy_turn() -> void:
@@ -189,3 +204,17 @@ func _log_current_souls() -> void:
 	for index: int in spheres.size():
 		var sphere: RigidBody2D = spheres[index]
 		print("スフィア%d: 現在ソウル %s" % [index + 1, sphere.get_current_soul_name()])
+
+
+func _collect_and_connect_enemies() -> void:
+	enemies.clear()
+	for child: Node in get_children():
+		if not child.has_method("apply_damage"):
+			continue
+		enemies.append(child)
+		if child.has_signal("enemy_defeated") and not child.enemy_defeated.is_connected(_on_enemy_defeated):
+			child.enemy_defeated.connect(_on_enemy_defeated)
+
+
+func _on_enemy_defeated(enemy: Node) -> void:
+	print("撃破: %s を倒した！" % enemy.name)
