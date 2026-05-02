@@ -28,6 +28,7 @@ const SOUL_LIBRARY: Dictionary = {
 @export var stop_speed_threshold: float = 20.0
 @export var collision_radius: float = 24.0
 @export var aim_line_path: NodePath = NodePath("AimLine")
+@export var sphere_color: Color = Color(1.0, 1.0, 1.0, 1.0)
 @export var initial_soul_ids: Array[StringName] = [
 	StringName("stone"),
 	StringName("stone"),
@@ -42,6 +43,7 @@ var souls: Array[Dictionary] = []
 var current_soul_index: int = 0
 
 @onready var aim_line: Line2D = get_node(aim_line_path) as Line2D
+@onready var sprite_2d: Sprite2D = $Sprite2D
 
 
 func _ready() -> void:
@@ -49,6 +51,7 @@ func _ready() -> void:
 	lock_rotation = true
 	freeze = true
 	aim_line.visible = false
+	sprite_2d.modulate = sphere_color
 	_initialize_souls()
 
 

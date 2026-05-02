@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/sphere.gd" id="1_d0s2o"]
+[ext_resource type="Texture2D" path="res://assets/sphere_placeholder.svg" id="2_h2d1f"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_hj8as"]
+friction = 0.0
+bounce = 1.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_4udr1"]
+radius = 24.0
+
+[node name="Sphere" type="RigidBody2D"]
+physics_material_override = SubResource("PhysicsMaterial_hj8as")
+gravity_scale = 0.0
+freeze = true
+continuous_cd = 2
+script = ExtResource("1_d0s2o")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_4udr1")
+
+[node name="AimLine" type="Line2D" parent="."]
+visible = false
+points = PackedVector2Array(0, 0, 0, -1)
+width = 4.0
+default_color = Color(0.25, 0.9, 1, 0.9)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_h2d1f")
