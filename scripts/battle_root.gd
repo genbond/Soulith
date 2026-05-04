@@ -22,6 +22,8 @@ var enemies: Array[Node] = []
 var launched_count: int = 0
 var enemy_manager: Node = null
 var current_phase: BattlePhase = BattlePhase.PLAYER_TURN
+var battle_cleared: bool = false
+var combat_has_enemies: bool = false
 
 
 func _ready() -> void:
@@ -45,10 +47,13 @@ func _ready() -> void:
 		sphere.sphere_stopped.connect(_on_sphere_stopped)
 
 	_collect_and_connect_enemies()
+	combat_has_enemies = not enemies.is_empty()
 	_enter_phase(BattlePhase.PLAYER_TURN)
 
 
 func _start_player_turn() -> void:
+	if battle_cleared:
+		return
 	launched_count = 0
 	for sphere: RigidBody2D in spheres:
 		sphere.start_new_turn()
@@ -77,6 +82,8 @@ func _on_sphere_launched(launched_sphere: RigidBody2D) -> void:
 
 
 func _on_sphere_stopped(stopped_sphere: RigidBody2D) -> void:
+	if battle_cleared:
+		return
 	if current_phase != BattlePhase.PLAYER_TURN:
 		return
 
@@ -93,6 +100,8 @@ func _on_sphere_stopped(stopped_sphere: RigidBody2D) -> void:
 
 
 func _on_sphere_hit_enemy(source_sphere: RigidBody2D, enemy: Node, attack_power: int) -> void:
+	if battle_cleared:
+		return
 	if current_phase != BattlePhase.PLAYER_TURN:
 		return
 	if not is_instance_valid(enemy):
@@ -102,9 +111,15 @@ func _on_sphere_hit_enemy(source_sphere: RigidBody2D, enemy: Node, attack_power:
 
 	enemy.apply_damage(attack_power)
 	print("%s -> %s に %d ダメージ (ヒット毎計算)" % [source_sphere.name, enemy.name, attack_power])
+	_try_enter_reward_if_all_enemies_defeated()
 
 
 func _start_enemy_turn() -> void:
+	if battle_cleared:
+		return
+	if combat_has_enemies and enemies.is_empty():
+		_enter_phase(BattlePhase.REWARD)
+		return
 	for sphere: RigidBody2D in spheres:
 		sphere.set_launch_enabled(false)
 
@@ -115,6 +130,8 @@ func _start_enemy_turn() -> void:
 
 
 func _start_resolve_phase() -> void:
+	if battle_cleared:
+		return
 	# TODO: Apply end-of-turn effects (poison, block, etc.).
 	_apply_soul_cycle_per_sphere()
 	_enter_phase(BattlePhase.PLAYER_TURN)
@@ -123,6 +140,13 @@ func _start_resolve_phase() -> void:
 func _start_reward_phase() -> void:
 	# TODO: Implement reward selection UI flow.
 	print("報酬フェーズ（未実装）")
+	print("戦闘勝利: 全敵を撃破した")
+	battle_cleared = true
+	for sphere: RigidBody2D in spheres:
+		sphere.set_launch_enabled(false)
+	await get_tree().create_timer(1.0).timeout
+	battle_cleared = false
+	_enter_phase(BattlePhase.PLAYER_TURN)
 
 
 func _enter_phase(next_phase: BattlePhase) -> void:
@@ -218,3 +242,26 @@ func _collect_and_connect_enemies() -> void:
 
 func _on_enemy_defeated(enemy: Node) -> void:
 	print("撃破: %s を倒した！" % enemy.name)
+	_unregister_enemy(enemy)
+	print("残り敵: %d" % enemies.size())
+	_try_enter_reward_if_all_enemies_defeated()
+
+
+func _try_enter_reward_if_all_enemies_defeated() -> void:
+	if battle_cleared:
+		return
+	if current_phase == BattlePhase.REWARD:
+		return
+	if not combat_has_enemies:
+		return
+	if not enemies.is_empty():
+		return
+	_enter_phase(BattlePhase.REWARD)
+
+
+func _unregister_enemy(enemy: Node) -> void:
+	if enemy == null:
+		return
+	if enemy.has_signal("enemy_defeated") and enemy.enemy_defeated.is_connected(_on_enemy_defeated):
+		enemy.enemy_defeated.disconnect(_on_enemy_defeated)
+	enemies.erase(enemy)

@@ -87,6 +87,7 @@ sphere_color = Color(0.6, 1, 0.5, 1)
 [node name="Enemy1" type="StaticBody2D" parent="." unique_id=1716366155]
 position = Vector2(876, 539)
 script = ExtResource("5_m4ubn")
+max_hp = 4
 metadata/_edit_group_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Enemy1" unique_id=1384727393]
