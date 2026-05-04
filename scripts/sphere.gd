@@ -35,6 +35,11 @@ const SOUL_LIBRARY: Dictionary = {
 	StringName("stone"),
 	StringName("stone")
 ]
+## 戦闘（ステージ）開始時に、initial_soul_ids の並びをランダム化する（_ready 内の初期化で一度だけ）
+@export var randomize_initial_soul_order: bool = true
+## スフィアが受けるダメージのブロック（敵攻撃など）。仕様 8.4 ではターン終了でリセットしない想定のため RESOLVE_PLAYER_END では減らさない（被ダメージ時に消費）。
+@export var block_stacks: int = 0
+@export var poison_stacks: int = 0
 
 var is_dragging: bool = false
 var can_launch: bool = false
@@ -187,6 +192,39 @@ func advance_soul_cycle() -> void:
 	current_soul_index = (current_soul_index + 1) % souls.size()
 
 
+## 戦闘報酬などでソウルを末尾に追加（現在表示中のソウル位置は変えない）
+func append_acquired_soul(soul_id: String) -> void:
+	var soul_data: Dictionary = SOUL_LIBRARY.get(soul_id, {})
+	if soul_data.is_empty():
+		push_warning("%s: 未知のソウル id '%s' は追加されません" % [name, soul_id])
+		return
+	souls.append(soul_data.duplicate(true))
+	print("%s: ソウル「%s」を獲得して末尾に追加" % [name, soul_data.get("display_name", soul_id)])
+
+
+func add_block_stacks(amount: int) -> void:
+	if amount <= 0:
+		return
+	block_stacks += amount
+	print("%s: ブロック +%d（合計 %d）" % [name, amount, block_stacks])
+
+
+func add_poison_stacks(amount: int) -> void:
+	if amount <= 0:
+		return
+	poison_stacks += amount
+	print("%s: 毒 +%d（合計 %d）" % [name, amount, poison_stacks])
+
+
+## プレイヤーターン終了時（RESOLVE_PLAYER_END）。毒は敵と同様にスタック式。ブロックはここでは触れない（持続・被ダメージで消費）。
+func on_player_turn_resolve_end(_battle_root: Node) -> void:
+	if poison_stacks <= 0:
+		return
+	var dmg: int = poison_stacks
+	print("%s: 毒 %d（スフィア HP 未実装のためダメージはログのみ）" % [name, dmg])
+	poison_stacks = maxi(poison_stacks - 1, 0)
+
+
 func _on_body_entered(body: Node) -> void:
 	if not is_in_flight:
 		return
@@ -198,7 +236,10 @@ func _on_body_entered(body: Node) -> void:
 
 func _initialize_souls() -> void:
 	souls.clear()
-	for soul_id_name: StringName in initial_soul_ids:
+	var ordered_ids: Array[StringName] = initial_soul_ids.duplicate()
+	if randomize_initial_soul_order and ordered_ids.size() > 1:
+		ordered_ids.shuffle()
+	for soul_id_name: StringName in ordered_ids:
 		var soul_id: String = String(soul_id_name)
 		var soul_data: Dictionary = SOUL_LIBRARY.get(soul_id, {})
 		if soul_data.is_empty():

@@ -6,6 +6,7 @@
 [ext_resource type="Script" uid="uid://bv67nlgs3e32j" path="res://scripts/enemy_manager.gd" id="4_5k3pn"]
 [ext_resource type="Script" uid="uid://cx2aaovscvu1k" path="res://scripts/enemy.gd" id="5_m4ubn"]
 [ext_resource type="PackedScene" path="res://scenes/sphere.tscn" id="6_h2ra6"]
+[ext_resource type="Script" path="res://scripts/reward_panel.gd" id="7_rewardpnl"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_wall"]
 friction = 0.0
@@ -25,6 +26,11 @@ script = ExtResource("1_8r08p")
 
 [node name="EnemyManager" type="Node" parent="." unique_id=1894959267]
 script = ExtResource("4_5k3pn")
+
+[node name="RewardPanel" type="CanvasLayer" parent="."]
+layer = 100
+visible = false
+script = ExtResource("7_rewardpnl")
 
 [node name="TopWall" type="StaticBody2D" parent="." unique_id=455841779]
 position = Vector2(800, 196)
@@ -79,15 +85,18 @@ sphere_color = Color(1, 0.45, 0.45, 1)
 [node name="Sphere2" parent="." unique_id=2082758651 instance=ExtResource("6_h2ra6")]
 position = Vector2(960, 620)
 sphere_color = Color(0.45, 0.9, 1, 1)
+initial_soul_ids = Array[StringName]([&"stone", &"stone", &"sword"])
 
 [node name="Sphere3" parent="." unique_id=1187348761 instance=ExtResource("6_h2ra6")]
 position = Vector2(1040, 620)
 sphere_color = Color(0.6, 1, 0.5, 1)
+initial_soul_ids = Array[StringName]([&"stone", &"stone", &"shield"])
 
 [node name="Enemy1" type="StaticBody2D" parent="." unique_id=1716366155]
 position = Vector2(876, 539)
 script = ExtResource("5_m4ubn")
-max_hp = 4
+max_hp = 21
+poison_stacks = 6
 metadata/_edit_group_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Enemy1" unique_id=1384727393]
